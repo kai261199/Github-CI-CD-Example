@@ -174,30 +174,6 @@ export class TodoStore {
         this._todos.update((list) => list.filter((t) => !t.completed));
     }
 
-    /**
-     * Reorder within the currently displayed (possibly filtered) list.
-     * The order slots occupied by the displayed items are reassigned to the
-     * items in their new relative order, leaving hidden items untouched.
-     */
-    reorder(displayed: Todo[], previousIndex: number, currentIndex: number): void {
-        if (previousIndex === currentIndex) {
-            return;
-        }
-        const moved = [...displayed];
-        const [item] = moved.splice(previousIndex, 1);
-        if (!item) {
-            return;
-        }
-        moved.splice(currentIndex, 0, item);
-        const slots = displayed.map((t) => t.order).sort((a, b) => a - b);
-        const orderById = new Map(moved.map((t, index) => [t.id, slots[index]]));
-        this._todos.update((list) =>
-            list.map((t) =>
-                orderById.has(t.id) ? { ...t, order: orderById.get(t.id)! } : t,
-            ),
-        );
-    }
-
     setFilter(patch: Partial<TodoFilters>): void {
         this.filters.update((f) => ({ ...f, ...patch }));
     }

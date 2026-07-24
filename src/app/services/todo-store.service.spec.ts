@@ -91,15 +91,4 @@ describe('TodoStore', () => {
         const raw = localStorage.getItem('flow.todos.v1');
         expect(raw).toContain('Persisted');
     });
-
-    it('reorders within the displayed list', () => {
-        store.add({ title: 'A' });
-        store.add({ title: 'B' });
-        store.add({ title: 'C' });
-        const before = store.todos().map((t) => t.title);
-        store.reorder(store.todos(), 0, 2);
-        const after = store.todos().map((t) => t.title);
-        expect(after).not.toEqual(before);
-        expect(after[2]).toBe(before[0]);
-    });
 });
