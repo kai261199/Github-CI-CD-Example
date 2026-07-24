@@ -13,7 +13,6 @@ deployment to **GitHub Pages**, and tag-triggered releases.
 - 📅 **Due dates** with overdue highlighting
 - 🔍 **Search & filter** by text, status, priority and tag
 - 🌗 **Dark / light** theme toggle (persisted, respects OS preference)
-- ↕️ **Drag-and-drop** reordering (Angular CDK)
 - 📊 **Dashboard** with progress bar and stats
 - 💾 Persists to the browser's **localStorage**
 
@@ -23,7 +22,6 @@ deployment to **GitHub Pages**, and tag-triggered releases.
 | ---------- | ---------------------------------------- |
 | Framework  | Angular 20 (standalone, signals)         |
 | Styling    | Tailwind CSS v4 (`@tailwindcss/postcss`) |
-| Drag/drop  | `@angular/cdk`                           |
 | Storage    | Browser `localStorage`                   |
 | Tests      | Karma + Jasmine (ChromeHeadless in CI)   |
 | Lint       | angular-eslint                           |
@@ -91,5 +89,5 @@ src/app/
     todo-form/       # add task
     filter-bar/      # search / status / priority / tag filters
     todo-item/       # single task (read + inline edit)
-    todo-list/       # drag-drop list + empty state
+    todo-list/       # task list + empty state
 ```

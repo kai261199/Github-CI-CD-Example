@@ -11,9 +11,9 @@
     }
 </div>
 
-<div cdkDropList (cdkDropListDropped)="drop($event)" class="flex flex-col gap-2.5 pb-2">
+<div class="flex flex-col gap-2.5 pb-2">
     @for (todo of todos(); track trackById($index, todo)) {
-    <div cdkDrag [cdkDragData]="todo" class="animate-in">
+    <div class="animate-in">
         <app-todo-item [todo]="todo" />
     </div>
     }
