@@ -1,0 +1,35 @@
+@if (todos().length > 0) {
+<div class="sticky top-0 z-10 mb-2 flex items-center justify-between px-1 py-1">
+    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        {{ todos().length }} {{ todos().length === 1 ? 'task' : 'tasks' }}
+    </p>
+    @if (totalCount().completed > 0) {
+    <button type="button" (click)="clearCompleted()"
+        class="text-xs font-medium text-slate-400 transition hover:text-rose-500">
+        Clear completed
+    </button>
+    }
+</div>
+
+<div cdkDropList (cdkDropListDropped)="drop($event)" class="flex flex-col gap-2.5 pb-2">
+    @for (todo of todos(); track trackById($index, todo)) {
+    <div cdkDrag [cdkDragData]="todo" class="animate-in">
+        <app-todo-item [todo]="todo" />
+    </div>
+    }
+</div>
+} @else {
+<div
+    class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300/80 bg-white/40 py-16 text-center dark:border-slate-700/80 dark:bg-slate-900/30">
+    <div
+        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-100 to-fuchsia-100 text-indigo-500 dark:from-indigo-500/20 dark:to-fuchsia-500/20 dark:text-indigo-300">
+        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+    </div>
+    <p class="mt-4 text-sm font-semibold text-slate-700 dark:text-slate-200">All clear!</p>
+    <p class="mt-1 text-xs text-slate-400">Add a task above or adjust your filters.</p>
+</div>
+}
