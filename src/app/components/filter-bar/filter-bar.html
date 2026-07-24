@@ -1,0 +1,67 @@
+<div class="surface p-2.5">
+    <div class="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
+        <!-- Search -->
+        <div class="relative flex-1 lg:max-w-xs">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M21 21l-4.3-4.3" />
+                </svg>
+            </span>
+            <input type="search" [ngModel]="filters().search" (ngModelChange)="setSearch($event)"
+                placeholder="Search tasks…" class="field !py-2 !pl-9" />
+        </div>
+
+        <!-- Status segmented control -->
+        <div class="inline-flex rounded-xl bg-slate-100/80 p-1 dark:bg-slate-800/60" role="group"
+            aria-label="Filter by status">
+            @for (s of statuses; track s.value) {
+            <button type="button" (click)="setStatus(s.value)"
+                class="rounded-lg px-3 py-1.5 text-sm font-medium transition" [class]="
+            filters().status === s.value
+              ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-950 dark:text-indigo-400'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+          ">
+                {{ s.label }}
+            </button>
+            }
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <select [ngModel]="filters().priority" (ngModelChange)="setPriority($event)"
+                class="field !w-auto !py-2 capitalize">
+                <option value="all">All priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+
+            <select [ngModel]="filters().tag" (ngModelChange)="setTag($event)" class="field !w-auto !py-2">
+                <option value="all">All tags</option>
+                @for (tag of allTags(); track tag) {
+                <option [value]="tag">#{{ tag }}</option>
+                }
+            </select>
+
+            <button type="button" (click)="sortByPriority()"
+                class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                title="Sort by priority" aria-label="Sort by priority">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
+                </svg>
+            </button>
+
+            <button type="button" (click)="reset()"
+                class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-400 transition hover:bg-slate-50 hover:text-rose-500 dark:border-slate-700 dark:hover:bg-slate-800"
+                title="Reset filters" aria-label="Reset filters">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                    <path d="M3 3v5h5" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>

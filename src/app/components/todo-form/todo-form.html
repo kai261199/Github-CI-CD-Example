@@ -1,0 +1,60 @@
+<form (ngSubmit)="submit()" class="surface p-2.5">
+    <div class="flex items-center gap-2">
+        <div class="relative min-w-0 flex-1">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-indigo-400">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+            </span>
+            <input type="text" name="title" [ngModel]="title()" (ngModelChange)="title.set($event)"
+                (focus)="expanded.set(true)" placeholder="Add a task…"
+                class="field !border-transparent !bg-slate-100/70 !py-2.5 !pl-9 dark:!bg-slate-800/60" />
+        </div>
+        <button type="button" (click)="expanded.set(!expanded())"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 text-slate-400 transition hover:bg-slate-50 hover:text-slate-600 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            [class.text-indigo-500]="expanded()" [attr.aria-expanded]="expanded()" aria-label="Toggle details">
+            <svg class="h-4 w-4 transition-transform" [class.rotate-180]="expanded()" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </button>
+        <button type="submit" [disabled]="!title().trim()"
+            class="flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm shadow-indigo-500/25 transition hover:bg-indigo-500 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100">
+            Add
+        </button>
+    </div>
+
+    @if (expanded()) {
+    <div class="mt-2.5 grid gap-2.5 border-t border-slate-100 px-1 pt-3 dark:border-slate-800 sm:grid-cols-2">
+        <label class="block">
+            <span class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Priority</span>
+            <select name="priority" [ngModel]="priority()" (ngModelChange)="priority.set($event)"
+                class="field capitalize">
+                @for (p of priorities; track p) {
+                <option [value]="p" class="capitalize">{{ p }}</option>
+                }
+            </select>
+        </label>
+
+        <label class="block">
+            <span class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Due date</span>
+            <input type="date" name="dueDate" [ngModel]="dueDate()" (ngModelChange)="dueDate.set($event)"
+                class="field" />
+        </label>
+
+        <label class="block sm:col-span-2">
+            <span class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Tags (comma
+                separated)</span>
+            <input type="text" name="tags" [ngModel]="tags()" (ngModelChange)="tags.set($event)"
+                placeholder="work, personal, urgent" class="field" />
+        </label>
+
+        <label class="block sm:col-span-2">
+            <span class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Notes</span>
+            <textarea name="notes" rows="2" [ngModel]="notes()" (ngModelChange)="notes.set($event)"
+                placeholder="Optional details…" class="field resize-none"></textarea>
+        </label>
+    </div>
+    }
+</form>
