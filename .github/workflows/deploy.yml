@@ -57,6 +57,7 @@ jobs:
 
   deploy:
     name: Deploy
+    # Wait for the build job to finish before deploying.
     needs: build
     runs-on: ubuntu-latest
     environment:
