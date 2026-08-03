@@ -1,40 +1,40 @@
-# 🧪 Tutorial: Reproducing the CI/CD flow from Commit to Release
+# 🧪 Tutorial: Tái hiện quy trình CI/CD từ Commit đến Release
 
-> A hands-on lab. You will go through a complete CI/CD lifecycle:
-> **edit code → commit → create a branch → open a Pull Request → merge into `main` → automatic deploy → create a tag/release.**
+> Bài lab thực hành. Học viên sẽ đi qua trọn vẹn một vòng đời CI/CD:
+> **sửa code → commit → tạo nhánh → mở Pull Request → merge vào `main` → deploy tự động → tạo tag/release.**
 >
-> ⚠️ **Mandatory rule of this lab:** DO NOT commit/merge directly into `main`.
-> Every change must go through a **separate branch** and then **merge into `main` via a Pull Request**.
+> ⚠️ **Quy tắc bắt buộc của bài lab:** KHÔNG commit/merge thẳng vào `main`.
+> Mọi thay đổi phải đi qua một **nhánh riêng** rồi **merge vào `main` bằng Pull Request**.
 
 ---
 
-## 🎯 The flow you are about to perform
+## 🎯 Sơ đồ luồng bạn sắp thực hiện
 
 ```mermaid
 flowchart LR
-    A[Edit code on a feature branch] --> B[git commit]
-    B --> C[git push the feature branch]
-    C --> D{CI runs<br/>lint + test + build}
-    D -->|green ✅| E[Open a Pull Request into main]
-    E --> F{CI runs again<br/>on pull_request}
-    F -->|green ✅| G[Merge the PR into main]
-    G --> H[Automatic deploy<br/>to GitHub Pages]
-    H --> I[Create a tag vX.Y.Z]
-    I --> J[Automatic release<br/>build + package .zip]
+    A[Sửa code trên nhánh feature] --> B[git commit]
+    B --> C[git push nhánh feature]
+    C --> D{CI chạy<br/>lint + test + build}
+    D -->|xanh ✅| E[Mở Pull Request vào main]
+    E --> F{CI chạy lại<br/>trên pull_request}
+    F -->|xanh ✅| G[Merge PR vào main]
+    G --> H[Deploy tự động<br/>lên GitHub Pages]
+    H --> I[Tạo tag vX.Y.Z]
+    I --> J[Release tự động<br/>build + đóng gói .zip]
 ```
 
 ---
 
-## 0. Prerequisites
+## 0. Yêu cầu trước khi bắt đầu
 
-| Required | Note |
+| Cần có | Ghi chú |
 | --- | --- |
-| **Node.js 20+** | Check: `node -v` |
-| **Git** | Check: `git --version` |
-| **A GitHub account** | With permission to create repos/PRs |
-| **Repo already on GitHub** | The `main` branch has been pushed to `origin` |
+| **Node.js 20+** | Kiểm tra: `node -v` |
+| **Git** | Kiểm tra: `git --version` |
+| **Tài khoản GitHub** | Có quyền tạo repo/PR |
+| **Repo đã ở trên GitHub** | Đã push nhánh `main` lên `origin` |
 
-Clone the repo (if you don't have it yet):
+Clone repo về máy (nếu chưa có):
 
 ```powershell
 git clone https://github.com/<username>/Github-CI-CD-Example.git
@@ -43,65 +43,65 @@ cd Github-CI-CD-Example
 
 ---
 
-## 1. Run the app locally
+## 1. Chạy thử ứng dụng ở máy local
 
 ```powershell
-npm install       # install dependencies
-npm start         # open http://localhost:4200
+npm install       # cài dependencies
+npm start         # mở http://localhost:4200
 ```
 
-Run exactly the same commands that **CI will run on GitHub** to make sure the code is "clean" before pushing:
+Chạy thử đúng các lệnh mà **CI sẽ chạy trên GitHub** để chắc chắn code "sạch" trước khi push:
 
 ```powershell
-npm run lint      # check code style
-npm run test:ci   # run unit tests (headless Chrome, run once)
-npm run build     # production build
+npm run lint      # kiểm tra code style
+npm run test:ci   # chạy unit test (headless Chrome, chạy 1 lần)
+npm run build     # build production
 ```
 
-> 💡 **Golden rule:** whatever fails locally will also fail on CI. Always run the 3 commands above before pushing so you don't have to wait for CI to report red.
+> 💡 **Nguyên tắc vàng:** thứ gì fail ở local thì cũng sẽ fail trên CI. Luôn chạy 3 lệnh trên trước khi push để không phải chờ CI báo đỏ.
 
 ---
 
-## 2. One-time GitHub setup (instructor or student does it)
+## 2. Cấu hình 1 lần trên GitHub (giảng viên hoặc học viên tự làm)
 
-### 2.1 Enable GitHub Pages
-1. Go to the repo → **Settings** (the repo's tab bar) → **Pages** (under *Code and automation*).
-2. **Build and deployment → Source** → choose **`GitHub Actions`**.
+### 2.1 Bật GitHub Pages
+1. Vào repo → **Settings** (thanh tab của repo) → **Pages** (mục *Code and automation*).
+2. **Build and deployment → Source** → chọn **`GitHub Actions`**.
 
-### 2.2 (Recommended) Enable Branch protection to "force" merging via PR
-This step helps enforce the "no direct merge into `main`" rule:
+### 2.2 (Khuyến nghị) Bật Branch protection để "ép" merge qua PR
+Đây là bước giúp thực thi đúng quy tắc "không merge thẳng vào `main`":
 
-1. Go to the repo → **Settings → Branches → Add branch ruleset** (or *Branch protection rules*).
+1. Vào repo → **Settings → Branches → Add branch ruleset** (hoặc *Branch protection rules*).
 2. **Branch name pattern:** `main`
-3. Enable these options:
+3. Bật các mục:
    - ✅ **Require a pull request before merging**
-   - ✅ **Require status checks to pass before merging** → select the **`Lint, test & build`** check
+   - ✅ **Require status checks to pass before merging** → chọn check **`Lint, test & build`**
    - ✅ **Do not allow bypassing the above settings**
 4. **Save changes**.
 
-> After this step, GitHub will **block** any `git push` directly to `main` — everything must go through a Pull Request.
+> Sau bước này, GitHub sẽ **chặn** mọi lần `git push` thẳng lên `main` — bắt buộc phải qua Pull Request.
 
 ---
 
-## 3. Create a working branch (feature branch)
+## 3. Tạo nhánh làm việc (feature branch)
 
-Always start from the latest `main`:
+Luôn xuất phát từ `main` mới nhất:
 
 ```powershell
 git checkout main
 git pull origin main
-git checkout -b feature/change-title
+git checkout -b feature/doi-tieu-de
 ```
 
-> Branch naming convention: `feature/...`, `fix/...`, `chore/...`.
+> Quy ước tên nhánh: `feature/...`, `fix/...`, `chore/...`.
 
 ---
 
-## 4. Make a small change
+## 4. Thực hiện một thay đổi nhỏ
 
-For example, open `src/index.html` and change the page title, or edit `src/app/app.html` and change the slogan `Stay on top of your day`. Any small change works — the goal is to see the pipeline run.
+Ví dụ mở `src/index.html` và đổi tiêu đề trang, hoặc `src/app/app.html` đổi dòng slogan `Stay on top of your day`. Bất kỳ thay đổi nhỏ nào cũng được — mục tiêu là để thấy pipeline chạy.
 
-Verify locally:
+Kiểm tra lại ở local:
 
 ```powershell
 npm run lint
@@ -110,71 +110,71 @@ npm run test:ci
 
 ---
 
-## 5. Commit the change
+## 5. Commit thay đổi
 
 ```powershell
 git add .
-git commit -m "feat: change home page title"
+git commit -m "feat: doi tieu de trang chu"
 ```
 
-> Suggested commit format (Conventional Commits): `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`.
+> Gợi ý format commit (Conventional Commits): `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`.
 
 ---
 
-## 6. Push the feature branch → CI runs the 1st time (the `push` event)
+## 6. Push nhánh feature → CI chạy lần 1 (sự kiện `push`)
 
 ```powershell
-git push -u origin feature/change-title
+git push -u origin feature/doi-tieu-de
 ```
 
-Go to the repo → the **Actions** tab. You will see the **CI** workflow run with the **push** event (because you pushed to a branch other than `main`).
-It runs: `npm ci` → **lint → test → build**.
+Vào repo → tab **Actions**. Bạn sẽ thấy workflow **CI** chạy với sự kiện **push** (vì bạn push lên nhánh khác `main`).
+Nó chạy: `npm ci` → **lint → test → build**.
 
 ---
 
-## 7. Open a Pull Request into `main` → CI runs the 2nd time (the `pull_request` event)
+## 7. Mở Pull Request vào `main` → CI chạy lần 2 (sự kiện `pull_request`)
 
-1. On GitHub, click **Compare & pull request** (or **Pull requests → New pull request**).
-2. **base:** `main`  ←  **compare:** `feature/change-title`.
-3. Set a title and description → **Create pull request**.
+1. Trên GitHub, bấm **Compare & pull request** (hoặc **Pull requests → New pull request**).
+2. **base:** `main`  ←  **compare:** `feature/doi-tieu-de`.
+3. Đặt tiêu đề, mô tả → **Create pull request**.
 
-On the PR page, the **checks** section will show the workflow **CI / Lint, test & build (pull_request)** running.
+Trong trang PR, phần **checks** sẽ hiện workflow **CI / Lint, test & build (pull_request)** đang chạy.
 
-> Why does it run twice? The configuration listens to both `push` (on the branch) and `pull_request` (into `main`). This is normal behavior.
-
----
-
-## 8. Wait for the checks to go green, then **Merge the PR into `main`**
-
-1. Wait for all checks to turn ✅ (if red → check the logs, fix, commit & push again to the same branch; the PR updates automatically).
-2. Click **Merge pull request** → **Confirm merge**.
-3. (Optional) **Delete branch** to clean up.
-
-> 🚫 **Reminder:** this is the key point of the lab — code only enters `main` **through a PR**, never with a direct `git push origin main`.
+> Vì sao chạy 2 lần? Cấu hình lắng nghe cả `push` (trên nhánh) và `pull_request` (vào `main`). Đây là hành vi bình thường.
 
 ---
 
-## 9. Automatic deploy to GitHub Pages (the CD part)
+## 8. Chờ check xanh rồi **Merge PR vào `main`**
 
-As soon as the PR is merged into `main`, the **Deploy to GitHub Pages** workflow triggers automatically.
+1. Đợi tất cả check chuyển sang ✅ (nếu đỏ → xem log, sửa, commit & push lại vào cùng nhánh; PR tự cập nhật).
+2. Bấm **Merge pull request** → **Confirm merge**.
+3. (Tùy chọn) **Delete branch** để dọn dẹp.
 
-1. Go to the **Actions** tab → open the **"Deploy to GitHub Pages"** run.
-2. Wait for the two jobs **Build** and **Deploy** to finish (✅).
-3. Open the deployed app at:
+> 🚫 **Nhắc lại:** đây là điểm mấu chốt của bài lab — code chỉ vào `main` **thông qua PR**, không bao giờ `git push origin main` trực tiếp.
+
+---
+
+## 9. Deploy tự động lên GitHub Pages (phần CD)
+
+Ngay khi PR được merge vào `main`, workflow **Deploy to GitHub Pages** tự kích hoạt.
+
+1. Vào tab **Actions** → mở run **"Deploy to GitHub Pages"**.
+2. Chờ 2 job **Build** và **Deploy** xong (✅).
+3. Mở app đã deploy tại:
    ```
    https://<username>.github.io/Github-CI-CD-Example/
    ```
-   (The link also appears in the **Deploy** job and under **Settings → Pages**.)
+   (Link cũng hiện trong job **Deploy** và ở **Settings → Pages**.)
 
-> If the deploy job is red due to a Pages permission error → go back to **step 2.1** and set Source = *GitHub Actions*.
+> Nếu job deploy đỏ vì lỗi quyền Pages → quay lại **bước 2.1** bật Source = *GitHub Actions*.
 
 ---
 
-## 10. Create a Tag to publish a Release (the Release part)
+## 10. Tạo Tag để phát hành Release (phần Release)
 
-A `vX.Y.Z` tag triggers the **Release** workflow: it rebuilds, packages the app into a `.zip` file, and creates a **GitHub Release** with an automatic changelog.
+Tag `vX.Y.Z` sẽ kích hoạt workflow **Release**: build lại, đóng gói app thành file `.zip`, và tạo **GitHub Release** kèm changelog tự động.
 
-### Option A — Using the command line
+### Cách A — Bằng dòng lệnh
 ```powershell
 git checkout main
 git pull origin main
@@ -182,39 +182,39 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-### Option B — Using the GitHub UI (no commands needed)
+### Cách B — Bằng giao diện GitHub (không cần lệnh)
 1. Repo → **Releases** → **Draft a new release**.
-2. **Choose a tag** → type `v1.0.0` → **Create new tag: v1.0.0 on publish**.
+2. **Choose a tag** → gõ `v1.0.0` → **Create new tag: v1.0.0 on publish**.
 3. **Target:** `main` → **Publish release**.
 
-Then go to **Actions** to watch the **"Release"** job run, and in **Releases** you will see the `flow-v1.0.0.zip` file attached.
+Sau đó vào **Actions** xem job **"Release"** chạy, rồi vào **Releases** sẽ thấy file `flow-v1.0.0.zip` được đính kèm.
 
 ---
 
-## ✅ Completion checklist
+## ✅ Checklist hoàn thành
 
-- [ ] Ran the app locally (`npm start`)
-- [ ] `npm run lint` / `test:ci` / `build` all pass locally
-- [ ] Created a feature branch from `main`
-- [ ] Commit + push the branch → **CI (push)** runs
-- [ ] Open a PR into `main` → **CI (pull_request)** runs
-- [ ] Merge the PR (NOT a direct merge) → **Deploy** runs
-- [ ] Opened the GitHub Pages URL
-- [ ] Push tag `v1.0.0` → **Release** runs and produces a `.zip` file
+- [ ] Chạy được app ở local (`npm start`)
+- [ ] `npm run lint` / `test:ci` / `build` đều pass ở local
+- [ ] Tạo nhánh feature từ `main`
+- [ ] Commit + push nhánh → **CI (push)** chạy
+- [ ] Mở PR vào `main` → **CI (pull_request)** chạy
+- [ ] Merge PR (KHÔNG merge thẳng) → **Deploy** chạy
+- [ ] Mở được URL GitHub Pages
+- [ ] Push tag `v1.0.0` → **Release** chạy và có file `.zip`
 
 ---
 
-## 🛠️ Common troubleshooting
+## 🛠️ Troubleshooting thường gặp
 
-| Symptom | Cause & fix |
+| Triệu chứng | Nguyên nhân & cách xử lý |
 | --- | --- |
-| CI red at the **Lint** step | Run `npm run lint` locally, fix the errors, commit again. |
-| CI red at the **test** step | Run `npm run test:ci` and see which test fails. |
-| **Deploy** job red (Pages) | You haven't enabled **Settings → Pages → Source = GitHub Actions** (step 2.1). |
-| Pages page is blank / asset errors | `--base-href` must match the repo name — the workflow handles this; check that the repo name is correct. |
-| Cannot push to `main` | This is expected (branch protection). Create a branch + PR. |
-| Release doesn't run | The tag must match the `vX.Y.Z` format (e.g. `v1.0.0`) and must be **pushed** to the remote. |
+| CI đỏ ở bước **Lint** | Chạy `npm run lint` ở local, sửa lỗi, commit lại. |
+| CI đỏ ở bước **test** | Chạy `npm run test:ci`, xem test nào fail. |
+| Job **Deploy** đỏ (Pages) | Chưa bật **Settings → Pages → Source = GitHub Actions** (bước 2.1). |
+| Trang Pages trắng / lỗi asset | `--base-href` phải khớp tên repo — workflow tự xử lý; kiểm tra tên repo đúng. |
+| Không push được lên `main` | Đúng như mong muốn (branch protection). Hãy tạo nhánh + PR. |
+| Release không chạy | Tag phải đúng dạng `vX.Y.Z` (vd `v1.0.0`), và phải được **push** lên remote. |
 
 ---
 
-📚 Want to understand **why** each step exists and what the workflow files contain? Continue reading [knowledge.md](knowledge.md).
+📚 Muốn hiểu **tại sao** mỗi bước tồn tại và các file workflow viết gì? Đọc tiếp [knowledge.md](knowledge.md).
